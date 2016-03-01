@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,48 +28,46 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        setFab();
+    }
+
+    public void setFab() {
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View v) {
+                HttpRequest request = new HttpRequest();
+                Map<String, String> headers = new HashMap<>();
+                RequestModel model = new RequestModel();
+                model.setUrl(Constants.Main_Url);
+                model.setMethod("POST");
+                model.setHeaders(headers);
+                model.setBody(null);
+                String result = "";
+                try {
+                    result = request.execute(model).get();
+                    Log.e("Goes", result);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                Log.e("Goes", result);
             }
         });
-
-        HttpRequest request = new HttpRequest();
-        Map<String, String> headers = new HashMap<>();
-        RequestModel model = new RequestModel();
-        model.setUrl(Constants.Main_Url);
-        model.setMethod("POST");
-        model.setHeaders(headers);
-        model.setBody(null);
-        String result = "";
-        try {
-            result = request.execute(model).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        Log.e("KOKOK", result);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
