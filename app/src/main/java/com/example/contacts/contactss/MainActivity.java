@@ -2,24 +2,24 @@ package com.example.contacts.contactss;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import com.example.contacts.contactss.model.RequestModel;
+import com.example.contacts.contactss.adapter.News;
+import com.example.contacts.contactss.api.Tut;
+import com.example.contacts.contactss.model.NewsItem;
 import com.example.contacts.contactss.utils.Constants;
-import com.example.contacts.contactss.utils.HttpRequest;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     FloatingActionButton fab;
+    RecyclerView feedRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setRecycler();
         setFab();
+    }
+
+    public void setRecycler() {
+        feedRecyclerView = (RecyclerView) findViewById(R.id.newsFeedRecyclerView);
+        feedRecyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        feedRecyclerView.setLayoutManager(linearLayoutManager);
     }
 
     public void setFab() {
@@ -36,24 +46,17 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HttpRequest request = new HttpRequest();
-                Map<String, String> headers = new HashMap<>();
-                RequestModel model = new RequestModel();
-                model.setUrl(Constants.Main_Url);
-                model.setMethod("POST");
-                model.setHeaders(headers);
-                model.setBody(null);
-                String result = "";
-                try {
-                    result = request.execute(model).get();
-                    Log.e("Goes", result);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
+                Tut.asyncGetNews(Constants.TusRss, new Tut.CallBackGetNews() {
+                    @Override
+                    public void onSuccess(ArrayList<NewsItem> model) {
+                        feedRecyclerView.setAdapter(new News(model, MainActivity.this));
+                    }
 
-                Log.e("Goes", result);
+                    @Override
+                    public void onError(String error) {
+
+                    }
+                });
             }
         });
     }
