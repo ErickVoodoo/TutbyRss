@@ -1,17 +1,19 @@
 package com.example.contacts.contactss;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.contacts.contactss.adapter.News;
 import com.example.contacts.contactss.api.Tut;
+import com.example.contacts.contactss.fragments.Feed;
+import com.example.contacts.contactss.fragments.Modules;
 import com.example.contacts.contactss.model.NewsItem;
 import com.example.contacts.contactss.utils.Constants;
 
@@ -19,7 +21,16 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     FloatingActionButton fab;
-    RecyclerView feedRecyclerView;
+
+    static final String MODULES_TAG = "MODULES_TAG";
+    static final String FEED_TAG = "FEED_TAG";
+
+
+    private Feed feedFragment;
+    private Modules modulesFragment;
+    private Fragment selectedFragment = null;
+
+    DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,21 +38,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
-        setRecycler();
+        setNavigationDrawer();
         setFab();
+        showFeed();
     }
 
-    public void setRecycler() {
-        feedRecyclerView = (RecyclerView) findViewById(R.id.newsFeedRecyclerView);
-        feedRecyclerView.setHasFixedSize(true);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        feedRecyclerView.setLayoutManager(linearLayoutManager);
-    }
-
-    public void setFab() {
+    private void setFab() {
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 Tut.asyncGetNews(Constants.TusRss, new Tut.CallBackGetNews() {
                     @Override
                     public void onSuccess(ArrayList<NewsItem> model) {
-                        feedRecyclerView.setAdapter(new News(model, MainActivity.this));
+                        /*feedRecyclerView.setAdapter(new News(model, MainActivity.this));*/
                     }
 
                     @Override
@@ -59,6 +63,56 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void setNavigationDrawer() {
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+    }
+
+    private void showFeed() {
+        if(!(selectedFragment instanceof Feed)) {
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            hideFragments();
+            if(null == feedFragment) {
+                feedFragment = new Feed();
+                fragmentTransaction.add(R.id.mainPager, feedFragment, FEED_TAG);
+            }
+            fragmentTransaction.show(feedFragment);
+            fragmentTransaction.commit();
+            getFragmentManager().executePendingTransactions();
+            selectedFragment = feedFragment;
+        }
+    }
+
+    private void showModules() {
+        if(!(selectedFragment instanceof Modules)) {
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            hideFragments();
+            if(null == modulesFragment) {
+                modulesFragment = new Modules();
+                fragmentTransaction.add(R.id.mainPager, modulesFragment, MODULES_TAG);
+            }
+            fragmentTransaction.show(modulesFragment);
+            fragmentTransaction.commit();
+            getFragmentManager().executePendingTransactions();
+            selectedFragment = modulesFragment;
+        }
+    }
+
+    private void hideFragments() {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        feedFragment = (Feed) getFragmentManager().findFragmentByTag(FEED_TAG);
+        if(null != feedFragment) {
+            fragmentTransaction.hide(feedFragment);
+        }
+
+        modulesFragment = (Modules) getFragmentManager().findFragmentByTag(MODULES_TAG);
+        if(null != modulesFragment) {
+            fragmentTransaction.hide(modulesFragment);
+        }
+
+        fragmentTransaction.commit();
+        getFragmentManager().executePendingTransactions();
     }
 
     @Override
