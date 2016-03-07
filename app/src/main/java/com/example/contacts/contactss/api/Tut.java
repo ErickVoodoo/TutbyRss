@@ -2,7 +2,7 @@ package com.example.contacts.contactss.api;
 
 import android.os.AsyncTask;
 
-import com.example.contacts.contactss.model.NewsItem;
+import com.example.contacts.contactss.model.FeedItem;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,19 +22,19 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class Tut {
     public static abstract class CallBackGetNews {
-        public abstract void onSuccess(ArrayList<NewsItem> model);
+        public abstract void onSuccess(ArrayList<FeedItem> model);
 
         public abstract void onError(String error);
     }
 
     public static void asyncGetNews(String query, final CallBackGetNews callback) {
-        new AsyncTask<String, Void, ArrayList<NewsItem>>() {
+        new AsyncTask<String, Void, ArrayList<FeedItem>>() {
             @Override
-            protected ArrayList<NewsItem> doInBackground(String... params) {
+            protected ArrayList<FeedItem> doInBackground(String... params) {
                 /*String result = "";
                 String responseLine = "";*/
 
-                ArrayList<NewsItem> Array = new ArrayList<>();
+                ArrayList<FeedItem> Array = new ArrayList<>();
 
 //                Uri.Builder builder = new Uri.Builder();
 //                builder.scheme("https")
@@ -70,7 +70,7 @@ public class Tut {
                     NodeList items = doc.getElementsByTagName("item");
                     for (int i = 0; i < items.getLength(); i++)
                     {
-                        NewsItem item = new NewsItem();
+                        FeedItem item = new FeedItem();
 
                         Node n = items.item(i);
                         if (n.getNodeType() != Node.ELEMENT_NODE)
@@ -93,7 +93,7 @@ public class Tut {
             }
 
             @Override
-            protected void onPostExecute(ArrayList<NewsItem> result) {
+            protected void onPostExecute(ArrayList<FeedItem> result) {
                 callback.onSuccess(result);
             }
         }.execute(query);

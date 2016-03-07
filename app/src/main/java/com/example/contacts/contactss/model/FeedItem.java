@@ -4,7 +4,7 @@ package com.example.contacts.contactss.model;
  * Created by Admin on 01.03.2016.
  */
 
-public class NewsItem
+public class FeedItem
 {
     private String guid;
 

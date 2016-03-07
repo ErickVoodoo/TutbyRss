@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.contacts.contactss.R;
+import com.example.contacts.contactss.model.FeedItem;
+
+import java.util.ArrayList;
 
 /**
  * Created by erick on 2.3.16.
@@ -29,7 +32,11 @@ public class Feed extends Fragment {
         feedRecyclerView.setHasFixedSize(true);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         feedRecyclerView.setLayoutManager(linearLayoutManager);
+    }
+
+    public void setRecyclerArray(ArrayList<FeedItem> model) {
+        feedRecyclerView.setAdapter(new com.example.contacts.contactss.adapter.Feed(model, this.getActivity()));
     }
 }

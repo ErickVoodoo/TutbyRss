@@ -4,6 +4,8 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +16,7 @@ import android.view.View;
 import com.example.contacts.contactss.api.Tut;
 import com.example.contacts.contactss.fragments.Feed;
 import com.example.contacts.contactss.fragments.Modules;
-import com.example.contacts.contactss.model.NewsItem;
+import com.example.contacts.contactss.model.FeedItem;
 import com.example.contacts.contactss.utils.Constants;
 
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment selectedFragment = null;
 
     DrawerLayout drawerLayout;
-
+    NavigationView navigationDrawer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
 
         setNavigationDrawer();
+        setDrawerLayout();
         setFab();
         showFeed();
     }
@@ -50,29 +53,54 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Tut.asyncGetNews(Constants.TusRss, new Tut.CallBackGetNews() {
-                    @Override
-                    public void onSuccess(ArrayList<NewsItem> model) {
-                        /*feedRecyclerView.setAdapter(new News(model, MainActivity.this));*/
-                    }
+                if (selectedFragment instanceof Feed &&
+                        null != feedFragment) {
+                    Tut.asyncGetNews(Constants.TusRss, new Tut.CallBackGetNews() {
+                        @Override
+                        public void onSuccess(ArrayList<FeedItem> model) {
+                            feedFragment.setRecyclerArray(model);
+                        }
 
-                    @Override
-                    public void onError(String error) {
+                        @Override
+                        public void onError(String error) {
 
-                    }
-                });
+                        }
+                    });
+                }
             }
         });
     }
 
-    private void setNavigationDrawer() {
+    private void setDrawerLayout() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+    }
+
+    private void setNavigationDrawer() {
+        navigationDrawer = (NavigationView) findViewById(R.id.nav_view);
+        navigationDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.nav_modules:{
+                        MainActivity.this.showModules();
+                        break;
+                    }
+                    case R.id.nav_feed:{
+                        MainActivity.this.showFeed();
+                        break;
+                    }
+                }
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
     }
 
     private void showFeed() {
         if(!(selectedFragment instanceof Feed)) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             hideFragments();
+            getSupportActionBar().setTitle("Feed");
             if(null == feedFragment) {
                 feedFragment = new Feed();
                 fragmentTransaction.add(R.id.mainPager, feedFragment, FEED_TAG);
@@ -88,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         if(!(selectedFragment instanceof Modules)) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             hideFragments();
+            getSupportActionBar().setTitle("Modules");
             if(null == modulesFragment) {
                 modulesFragment = new Modules();
                 fragmentTransaction.add(R.id.mainPager, modulesFragment, MODULES_TAG);
