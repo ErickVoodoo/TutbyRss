@@ -8,11 +8,15 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.contacts.contactss.adapter.Drawer;
 import com.example.contacts.contactss.api.Tut;
 import com.example.contacts.contactss.fragments.Feed;
 import com.example.contacts.contactss.fragments.Modules;
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
     NavigationView navigationDrawer;
+    RecyclerView drawerRecycler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setNavigationDrawer();
         setDrawerLayout();
         setFab();
+        setRecycler();
         showFeed();
     }
 
@@ -73,6 +79,41 @@ public class MainActivity extends AppCompatActivity {
 
     private void setDrawerLayout() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                Log.e("STATE", String.valueOf(newState));
+                if (newState == DrawerLayout.STATE_IDLE) {
+                    drawerRecycler.setAdapter(new Drawer(MainActivity.this));
+                } else {
+                    drawerRecycler.setAdapter(new Drawer(null));
+                }
+            }
+        });
+    }
+
+    public void setRecycler() {
+        drawerRecycler = (RecyclerView) findViewById(R.id.drawerRecycler);
+        drawerRecycler.setHasFixedSize(true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        drawerRecycler.setLayoutManager(linearLayoutManager);
     }
 
     private void setNavigationDrawer() {
@@ -96,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showFeed() {
+    public void showFeed() {
         if(!(selectedFragment instanceof Feed)) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             hideFragments();
@@ -112,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showModules() {
+    public void showModules() {
         if(!(selectedFragment instanceof Modules)) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             hideFragments();

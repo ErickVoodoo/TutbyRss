@@ -47,15 +47,5 @@
             android:src="@android:drawable/stat_notify_sync" />
     </android.support.design.widget.CoordinatorLayout>
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/menu_drawer"
-        app:itemTextColor="@android:color/white"
-        android:background="@android:color/black"
-        android:alpha="0.6"/>
+    <include layout="@layout/drawer_menu" />
 </android.support.v4.widget.DrawerLayout>

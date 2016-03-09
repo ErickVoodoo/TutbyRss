@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Contactss</string>
     <string name="action_settings">Settings</string>
+
+    <string-array name="drawer">
+        <item>Modules</item>
+        <item>Feed</item>
+    </string-array>
 </resources>
