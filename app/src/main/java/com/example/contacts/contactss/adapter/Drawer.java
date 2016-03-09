@@ -10,12 +10,15 @@ import android.widget.TextView;
 
 import com.example.contacts.contactss.MainActivity;
 import com.example.contacts.contactss.R;
+import com.example.contacts.contactss.utils.Constants;
+
+import java.util.ArrayList;
 
 /**
  * Created by erick on 5.3.16.
  */
 public class Drawer extends RecyclerView.Adapter<Drawer.ViewHolder> {
-    String[] stringArray = new String[0];
+    ArrayList<Constants.ModulesClass> array = new ArrayList<>();
     Activity activity;
 
     @Override
@@ -25,7 +28,7 @@ public class Drawer extends RecyclerView.Adapter<Drawer.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.textView.setText(stringArray[position]);
+        holder.textView.setText(array.get(position).getName());
         holder.textView.setAlpha(0);
         holder.textView.animate().alpha(1).setDuration(200).setStartDelay(100 * position).setListener(new Animator.AnimatorListener() {
             @Override
@@ -51,19 +54,20 @@ public class Drawer extends RecyclerView.Adapter<Drawer.ViewHolder> {
         holder.textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (position == 0) {
+                /*if (position == 0) {
                     ((MainActivity) activity).showModules();
                 } else
                 if (position == 1) {
                     ((MainActivity) activity).showFeed();
-                }
+                }*/
+                ((MainActivity) activity).selectNewFeed(array.get(position));
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return stringArray.length;
+        return array.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -78,8 +82,9 @@ public class Drawer extends RecyclerView.Adapter<Drawer.ViewHolder> {
 
     public Drawer(Activity activity) {
         if(null != activity) {
+            Constants constants = new Constants();
             this.activity = activity;
-            stringArray = this.activity.getResources().getStringArray(R.array.drawer);
+            array = constants.ModulesArray;
         }
     }
 }

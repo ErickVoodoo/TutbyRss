@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -36,22 +35,28 @@ public class MainActivity extends AppCompatActivity {
     private Modules modulesFragment;
     private Fragment selectedFragment = null;
 
+    String url;
+
     DrawerLayout drawerLayout;
-    NavigationView navigationDrawer;
     RecyclerView drawerRecycler;
+    Constants constants;
+    String SELECTED_FEED;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        constants = new Constants();
+        SELECTED_FEED = constants.ModulesArray.get(0).getUrl();
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        setNavigationDrawer();
+        
         setDrawerLayout();
         setFab();
         setRecycler();
         showFeed();
+        getSupportActionBar().setTitle(constants.ModulesArray.get(0).getName());
     }
 
     private void setFab() {
@@ -61,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (selectedFragment instanceof Feed &&
                         null != feedFragment) {
-                    Tut.asyncGetNews(Constants.TusRss, new Tut.CallBackGetNews() {
+                    Tut.asyncGetNews(SELECTED_FEED, new Tut.CallBackGetNews() {
                         @Override
                         public void onSuccess(ArrayList<FeedItem> model) {
                             feedFragment.setRecyclerArray(model);
@@ -116,25 +121,10 @@ public class MainActivity extends AppCompatActivity {
         drawerRecycler.setLayoutManager(linearLayoutManager);
     }
 
-    private void setNavigationDrawer() {
-        navigationDrawer = (NavigationView) findViewById(R.id.nav_view);
-        navigationDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.nav_modules:{
-                        MainActivity.this.showModules();
-                        break;
-                    }
-                    case R.id.nav_feed:{
-                        MainActivity.this.showFeed();
-                        break;
-                    }
-                }
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            }
-        });
+    public void selectNewFeed(Constants.ModulesClass module) {
+        SELECTED_FEED = module.getUrl();
+        getSupportActionBar().setTitle(module.getName());
+        drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     public void showFeed() {
@@ -183,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
 
         fragmentTransaction.commit();
         getFragmentManager().executePendingTransactions();
+        drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     @Override

@@ -6,6 +6,7 @@
     android:layout_gravity="start"
     android:fitsSystemWindows="false"
     android:orientation="vertical"
+    android:layout_marginTop="?attr/actionBarSize"
     android:gravity="center"
     android:background="@android:color/black"
     android:alpha="0.8">
